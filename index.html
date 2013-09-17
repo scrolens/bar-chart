@@ -1,0 +1,218 @@
+<!-- shamelessly stolen from scott murray: http://alignedleft.com/tutorials -->
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>D3 Test</title>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <style type="text/css">
+
+svg {
+    border: 1px #E28C05;
+}
+
+.bar {
+  fill: #ddd;
+}
+
+#text{
+    font-family: helvetica;
+    font-size: 10px;
+}
+
+.g-ESPN {
+    fill: #E28C05;
+    stroke: 1.5px;
+}
+
+        .g-TNT {
+            fill: #5F6062;
+        }
+
+        .g-ESPN2 {
+            fill: #5F6062;
+        }
+
+        .g-TBS {
+            fill: #5F6062;
+        }
+
+        .g-MSNBC {
+            fill: #5F6062;
+        }
+
+        .g-C-SPAN {
+            fill: #5F6062;
+        }
+
+        .axis {
+            shape-rendering: crispEdges;
+        }
+
+        .x.axis line {
+            stroke: #fff;
+        }
+
+        .x.axis .minor {
+            stroke-opacity: .5;
+        }
+
+        .x.axis path {
+            display: none;
+        }
+
+        .y.axis line, .y.axis path {
+            fill: none;
+            stroke: #000;
+        }
+
+</style>
+
+    </head>
+    <body>
+        <script type="text/javascript">
+            // Your beautiful D3 code will go here
+            d3.select("body").append("h1").text("Cost per pay TV subscriber per month")
+
+        var margin = {
+            top: 20, 
+            right: 10, 
+            bottom: 20, 
+            left: 10};
+
+        var width = 600 - margin.left - margin.right, height = 250 - margin.top - margin.bottom;
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            var parse = d3.time.format("%b %Y").parse;
+
+            var x = d3.time.scale().range([0, width]),
+                y = d3.scale.linear().range([height, 0]),
+                xAxis = d3.svg.axis().scale(x).tickSize(-height).tickSubdivide(true),
+                yAxis = d3.svg.axis().scale(y).ticks(4).orient("right");
+
+            d3.csv("subscription-prices.csv", function(err, prices) {
+          console.log(prices)
+
+          prices.forEach(function(d) {
+    // recasts d.2013 as a number, not a string
+    d.X2013 = +d.X2013;
+    prices.sort(function(a,b) {
+    return a.X2013 - b.X2013;
+});
+
+    var y = d3.scale.linear()
+        .domain([0,6])
+        .range([0,height]);
+
+    var x = d3.scale.linear()
+        .domain([0,prices.length])
+        .range([0,width]);
+
+    var bar = svg.selectAll(".bar")
+.data(prices)
+                    .enter().append("rect")
+                    .attr("height", function(d) { return y(d.X2013); })
+                    .attr("width", 2)
+                    .attr("y", function(d) { return height - y(d.X2013)  })
+                    .attr("x", function(d, i) { return 3 * i})
+                    .attr("class", "bar")
+                    .classed("g-ESPN", function(d) { return d.Network == "ESPN"})
+                    .classed("g-TNT", function(d) { return d.Network == "TNT"})
+                    .classed("g-ESPN2", function(d) { return d.Network == "ESPN2"})
+                    .classed("g-TBS", function(d) { return d.Network == "TBS"})
+                    .classed("g-MSNBC", function(d) { return d.Network == "MSNBC"})
+                    .classed("g-C-SPAN", function(d) { return d.Network == "C-SPAN"});
+
+                
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 510)
+                    .attr("y", 25)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("ESPN ($5.54)")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 515)
+                    .attr("y", 160)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("TNT ($1.24)")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 492)
+                    .attr("y", 175)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("ESPN2 ($.70)")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 490)
+                    .attr("y", 190)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("TBS ($.59)")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 365)
+                    .attr("y", 200)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("MSNBC ($.21)")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 50)
+                    .attr("y", 205)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .text("C-SPAN ($.06)")
+
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 30)
+                    .attr("y", 50)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "12px")
+                    .text("Is ESPN watched significantly more than the other channels on thsi list?")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 30)
+                    .attr("y", 70)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "12px")
+                    .text("How do ESPN's ratings compare to 'free' programming broadcast on network TV?")
+
+                svg.append("text")
+                    .attr("class", "g-label")
+                    .attr("x", 30)
+                    .attr("y", 90)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "12px")
+                    .text("How different are ratings for ESPN's live sporting events and ESPN's original programming?")
+                
+
+
+})
+
+
+
+    console.log(prices)
+        });
+ 
+      
+
+        </script>
+    </body>
+</html>
